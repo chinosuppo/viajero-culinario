@@ -16,6 +16,7 @@ function rowToFavorito(row) {
 
 function rowToHistorial(row) {
   return {
+    id: row.id,
     recipeId: row.recipe_id,
     countryId: row.country_id,
     pais: row.pais,
@@ -45,6 +46,7 @@ function favoritoToRow(userId, country, recipe, fecha) {
 function historialToRow(userId, country, recipe, fecha) {
   return {
     ...favoritoToRow(userId, country, recipe, fecha),
+    id: crypto.randomUUID(),
     continente: country.continente,
   };
 }
@@ -106,8 +108,9 @@ export function useCloudData(usuario) {
     }
 
     const fecha = new Date().toISOString();
-    setFavoritosCloud((prev) => [...prev, favoritoToRow(usuario.id, country, recipe, fecha)].map(rowToFavorito));
-    const { error } = await supabase.from('favoritos').insert(favoritoToRow(usuario.id, country, recipe, fecha));
+    const fila = favoritoToRow(usuario.id, country, recipe, fecha);
+    setFavoritosCloud((prev) => [...prev, rowToFavorito(fila)]);
+    const { error } = await supabase.from('favoritos').insert(fila);
     if (error) {
       console.error('[supabase] error al guardar favorito', error);
       recargar();
@@ -122,6 +125,20 @@ export function useCloudData(usuario) {
     const { error } = await supabase.from('historial').insert(fila);
     if (error) {
       console.error('[supabase] error al guardar historial', error);
+      recargar();
+    }
+  }
+
+  async function eliminarHistorialCloud(id) {
+    if (!supabase || !usuario) return;
+    setHistorialCloud((prev) => prev.filter((h) => h.id !== id));
+    const { error } = await supabase
+      .from('historial')
+      .delete()
+      .eq('user_id', usuario.id)
+      .eq('id', id);
+    if (error) {
+      console.error('[supabase] error al quitar del historial', error);
       recargar();
     }
   }
@@ -147,6 +164,7 @@ export function useCloudData(usuario) {
       fecha: f.fecha,
     }));
     const filasHistorial = historialLocales.map((h) => ({
+      id: h.id ?? crypto.randomUUID(),
       user_id: usuario.id,
       recipe_id: h.recipeId,
       country_id: h.countryId,
@@ -178,6 +196,7 @@ export function useCloudData(usuario) {
     cargando,
     toggleFavoritoCloud,
     agregarHistorialCloud,
+    eliminarHistorialCloud,
     migrarDatosLocalesSiHaceFalta,
   };
 }

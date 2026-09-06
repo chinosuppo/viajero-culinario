@@ -18,7 +18,6 @@ export default function App() {
   const [filter, setFilter] = useLocalStorage('vc_filter', 'desafiante');
   const [favoritosLocal, setFavoritosLocal] = useLocalStorage('vc_favoritos', []);
   const [historialLocal, setHistorialLocal] = useLocalStorage('vc_historial', []);
-  const [drawHistory, setDrawHistory] = useLocalStorage('vc_sorteos', []);
   const [currentCountryId, setCurrentCountryId] = useLocalStorage('vc_pais_actual', null);
 
   const [view, setView] = useState(() => (readLS('vc_pais_actual', null) ? 'pais' : 'inicio'));
@@ -26,8 +25,14 @@ export default function App() {
 
   const { usuario, loading: authLoading, disponible: authDisponible, enviarMagicLink, cerrarSesion } =
     useAuth();
-  const { favoritosCloud, historialCloud, toggleFavoritoCloud, agregarHistorialCloud, migrarDatosLocalesSiHaceFalta } =
-    useCloudData(usuario);
+  const {
+    favoritosCloud,
+    historialCloud,
+    toggleFavoritoCloud,
+    agregarHistorialCloud,
+    eliminarHistorialCloud,
+    migrarDatosLocalesSiHaceFalta,
+  } = useCloudData(usuario);
 
   const estaLogueado = !!usuario;
   const favorites = estaLogueado ? favoritosCloud : favoritosLocal;
@@ -46,7 +51,7 @@ export default function App() {
   const currentCountry = countries.find((c) => c.id === currentCountryId) || null;
 
   function handleElegirPais() {
-    const country = pickRandomCountry(countries, drawHistory, filter);
+    const country = pickRandomCountry(countries, history, filter);
     setCurrentCountryId(country.id);
     setLastCooked(null);
     setView('pais');
@@ -85,6 +90,7 @@ export default function App() {
       setHistorialLocal((prev) => [
         ...prev,
         {
+          id: crypto.randomUUID(),
           recipeId: recipe.id,
           countryId: country.id,
           pais: country.pais,
@@ -98,10 +104,23 @@ export default function App() {
       ]);
     }
 
-    // El registro de sorteos (anti-repetición de 4 semanas) queda local
-    // en todos los casos, no depende de la cuenta.
-    setDrawHistory((prev) => [...prev, { countryId: country.id, fecha }]);
     setLastCooked({ countryId: country.id, nombre: recipe.nombre });
+  }
+
+  function handleRemoveHistorial(entry) {
+    if (estaLogueado) {
+      eliminarHistorialCloud(entry.id);
+      return;
+    }
+    // Las entradas viejas guardadas antes de tener `id` propio se
+    // identifican por receta+fecha en su lugar.
+    setHistorialLocal((prev) =>
+      prev.filter((h) =>
+        entry.id
+          ? h.id !== entry.id
+          : !(h.recipeId === entry.recipeId && h.fecha === entry.fecha)
+      )
+    );
   }
 
   function handleNavigate(destino) {
@@ -155,7 +174,9 @@ export default function App() {
           />
         )}
 
-        {view === 'historial' && <HistoryView history={history} />}
+        {view === 'historial' && (
+          <HistoryView history={history} onRemove={handleRemoveHistorial} />
+        )}
 
         {view === 'estadisticas' && (
           <StatsPanel history={history} totalCountries={countries.length} />

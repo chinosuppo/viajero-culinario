@@ -10,7 +10,7 @@ function formatearFecha(iso) {
   });
 }
 
-export default function HistoryView({ history }) {
+export default function HistoryView({ history, onRemove }) {
   if (history.length === 0) {
     return (
       <div className="empty-state">
@@ -30,7 +30,7 @@ export default function HistoryView({ history }) {
           .slice()
           .reverse()
           .map((h, i) => (
-            <div key={`${h.recipeId}-${h.fecha}-${i}`} className="simple-item">
+            <div key={h.id ?? `${h.recipeId}-${h.fecha}-${i}`} className="simple-item">
               <Flag emoji={h.bandera} size={48} className="flag" />
               <div className="simple-item-info">
                 <strong>{h.nombre}</strong>
@@ -39,6 +39,13 @@ export default function HistoryView({ history }) {
                 </span>
               </div>
               <span className="acc-emoji">{ACC_EMOJI[h.accesibilidad]}</span>
+              <button
+                className="btn-remove"
+                onClick={() => onRemove(h)}
+                title="Sacar del historial"
+              >
+                Quitar
+              </button>
             </div>
           ))}
       </div>
