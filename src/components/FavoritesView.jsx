@@ -1,6 +1,7 @@
 import Flag from './Flag';
+import RecipeCard from './RecipeCard';
 
-export default function FavoritesView({ favorites, onRemove }) {
+export default function FavoritesView({ favorites, countries, history, onToggleFavorite, onCocinar }) {
   if (favorites.length === 0) {
     return (
       <div className="empty-state">
@@ -12,27 +13,48 @@ export default function FavoritesView({ favorites, onRemove }) {
     );
   }
 
+  const resueltos = favorites
+    .slice()
+    .reverse()
+    .map((f) => {
+      const country = countries.find((c) => c.id === f.countryId);
+      const recipe = country?.recetas.find((r) => r.id === f.recipeId);
+      return { favorito: f, country, recipe };
+    });
+
   return (
     <div className="list-view">
       <h2>❤️ Tus recetas favoritas</h2>
-      <div className="simple-list">
-        {favorites
-          .slice()
-          .reverse()
-          .map((f) => (
-            <div key={f.recipeId} className="simple-item">
-              <Flag emoji={f.bandera} size={48} className="flag" />
-              <div className="simple-item-info">
-                <strong>{f.nombre}</strong>
-                <span>
-                  {f.pais} · {f.tipo}
-                </span>
+      <div className="recipe-list">
+        {resueltos.map(({ favorito, country, recipe }) => {
+          if (!country || !recipe) {
+            return (
+              <div key={favorito.recipeId} className="simple-item">
+                <span className="flag">{favorito.bandera}</span>
+                <div className="simple-item-info">
+                  <strong>{favorito.nombre}</strong>
+                  <span>Esta receta ya no está disponible en los datos actuales.</span>
+                </div>
               </div>
-              <button className="btn-remove" onClick={() => onRemove(f.recipeId)}>
-                Quitar
-              </button>
-            </div>
-          ))}
+            );
+          }
+          return (
+            <RecipeCard
+              key={favorito.recipeId}
+              recipe={recipe}
+              countryLabel={
+                <>
+                  <Flag emoji={country.bandera} size={24} />
+                  {country.pais}
+                </>
+              }
+              isFavorite
+              isCooked={history.some((h) => h.recipeId === recipe.id)}
+              onToggleFavorite={() => onToggleFavorite(country, recipe)}
+              onCocinar={() => onCocinar(country, recipe)}
+            />
+          );
+        })}
       </div>
     </div>
   );

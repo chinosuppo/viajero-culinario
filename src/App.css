@@ -373,9 +373,31 @@
 
 .recipe-card-title {
   display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.recipe-card-title-row {
+  display: flex;
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+.recipe-country-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--marron-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.recipe-country-label .flag-img {
+  width: 20px;
+  height: 15px;
 }
 
 .recipe-card-title h3 {

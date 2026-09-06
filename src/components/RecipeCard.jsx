@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { ACCESIBILIDAD_INFO } from '../utils/filters';
 
-export default function RecipeCard({ recipe, isFavorite, isCooked, onToggleFavorite, onCocinar }) {
+export default function RecipeCard({
+  recipe,
+  isFavorite,
+  isCooked,
+  onToggleFavorite,
+  onCocinar,
+  countryLabel,
+}) {
   const [open, setOpen] = useState(false);
   const info = ACCESIBILIDAD_INFO[recipe.accesibilidad];
   const esPostre = recipe.tipo === 'Postre';
@@ -10,10 +17,13 @@ export default function RecipeCard({ recipe, isFavorite, isCooked, onToggleFavor
     <div className={`recipe-card ${open ? 'is-open' : ''}`}>
       <button className="recipe-card-header" onClick={() => setOpen((o) => !o)}>
         <div className="recipe-card-title">
-          <span className={`recipe-tipo-badge ${esPostre ? 'postre' : 'principal'}`}>
-            {esPostre ? '🍰 Postre' : '🍽️ Plato Principal'}
-          </span>
-          <h3>{recipe.nombre}</h3>
+          {countryLabel && <div className="recipe-country-label">{countryLabel}</div>}
+          <div className="recipe-card-title-row">
+            <span className={`recipe-tipo-badge ${esPostre ? 'postre' : 'principal'}`}>
+              {esPostre ? '🍰 Postre' : '🍽️ Plato Principal'}
+            </span>
+            <h3>{recipe.nombre}</h3>
+          </div>
         </div>
         <div className="recipe-card-meta">
           <span className="acc-emoji" title={info.label}>

@@ -50,10 +50,6 @@ export default function App() {
     });
   }
 
-  function handleRemoveFavorite(recipeId) {
-    setFavorites((prev) => prev.filter((f) => f.recipeId !== recipeId));
-  }
-
   function handleCocinarEstaSemana(country, recipe) {
     const fecha = new Date().toISOString();
     setHistory((prev) => [
@@ -107,7 +103,13 @@ export default function App() {
         )}
 
         {view === 'favoritos' && (
-          <FavoritesView favorites={favorites} onRemove={handleRemoveFavorite} />
+          <FavoritesView
+            favorites={favorites}
+            countries={countries}
+            history={history}
+            onToggleFavorite={handleToggleFavorite}
+            onCocinar={handleCocinarEstaSemana}
+          />
         )}
 
         {view === 'historial' && <HistoryView history={history} />}
