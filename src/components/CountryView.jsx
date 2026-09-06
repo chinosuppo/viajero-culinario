@@ -1,8 +1,10 @@
 import RecipeCard from './RecipeCard';
 import Flag from './Flag';
+import { matchesFilter } from '../utils/filters';
 
 export default function CountryView({
   country,
+  filter,
   favorites,
   history,
   lastCooked,
@@ -10,6 +12,9 @@ export default function CountryView({
   onCocinar,
   onSortearOtro,
 }) {
+  const recetasFiltradas = country.recetas.filter((r) => matchesFilter(r.accesibilidad, filter));
+  const recetasAMostrar = recetasFiltradas.length > 0 ? recetasFiltradas : country.recetas;
+
   return (
     <div className="country-view">
       <div className="country-header">
@@ -28,8 +33,14 @@ export default function CountryView({
         </div>
       )}
 
+      {recetasFiltradas.length === 0 && (
+        <p className="filter-warning">
+          Ninguna receta de {country.pais} entra en el filtro actual — te mostramos las 5 igual.
+        </p>
+      )}
+
       <div className="recipe-list">
-        {country.recetas.map((recipe) => (
+        {recetasAMostrar.map((recipe) => (
           <RecipeCard
             key={recipe.id}
             recipe={recipe}

@@ -12,7 +12,7 @@ import StatsPanel from './components/StatsPanel';
 import './App.css';
 
 export default function App() {
-  const [filter, setFilter] = useLocalStorage('vc_filter', 'todas');
+  const [filter, setFilter] = useLocalStorage('vc_filter', 'desafiante');
   const [favorites, setFavorites] = useLocalStorage('vc_favoritos', []);
   const [history, setHistory] = useLocalStorage('vc_historial', []);
   const [drawHistory, setDrawHistory] = useLocalStorage('vc_sorteos', []);
@@ -93,6 +93,7 @@ export default function App() {
         {view === 'pais' && currentCountry && (
           <CountryView
             country={currentCountry}
+            filter={filter}
             favorites={favorites}
             history={history}
             lastCooked={lastCooked}

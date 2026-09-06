@@ -1,7 +1,7 @@
 export const FILTER_OPTIONS = [
-  { value: 'facil', label: 'Solo recetas fáciles', hint: '🟢 prioriza países con opciones fáciles' },
-  { value: 'todas', label: 'Mostrar todas', hint: '🟢🟡 fácil + medio (default)' },
-  { value: 'desafiante', label: 'Incluir desafiantes', hint: '🟢🟡🔴 sin límites' },
+  { value: 'facil', label: 'Solo recetas fáciles', hint: '🟢 únicamente' },
+  { value: 'todas', label: 'Mostrar todas', hint: '🟢🟡 fácil + medio' },
+  { value: 'desafiante', label: 'Incluir desafiantes', hint: '🟢🟡🔴 todo (default)' },
 ];
 
 export const ACCESIBILIDAD_INFO = {

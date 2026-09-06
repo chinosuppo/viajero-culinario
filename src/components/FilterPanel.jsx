@@ -4,8 +4,8 @@ export default function FilterPanel({ filter, onChange }) {
   return (
     <div className="filter-panel">
       <span className="filter-label">
-        Nivel de accesibilidad de ingredientes: influye en qué países es más probable que te toquen.
-        Dentro de cada país siempre vas a ver las 5 recetas, con su indicador bien visible.
+        Nivel de accesibilidad de ingredientes: filtra qué recetas ves en cada país (y también qué
+        países es más probable que te toquen). Por defecto se muestra todo.
       </span>
       <div className="filter-options">
         {FILTER_OPTIONS.map((opt) => (
