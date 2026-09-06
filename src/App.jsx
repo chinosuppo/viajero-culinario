@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { countries } from './data/countries';
 import { useLocalStorage, readLS } from './hooks/useLocalStorage';
+import { useAuth } from './hooks/useAuth';
+import { useCloudData } from './hooks/useCloudData';
 import { pickRandomCountry } from './utils/draw';
 import Header from './components/Header';
+import AuthBar from './components/AuthBar';
 import FilterPanel from './components/FilterPanel';
 import Home from './components/Home';
 import CountryView from './components/CountryView';
@@ -13,13 +16,32 @@ import './App.css';
 
 export default function App() {
   const [filter, setFilter] = useLocalStorage('vc_filter', 'desafiante');
-  const [favorites, setFavorites] = useLocalStorage('vc_favoritos', []);
-  const [history, setHistory] = useLocalStorage('vc_historial', []);
+  const [favoritosLocal, setFavoritosLocal] = useLocalStorage('vc_favoritos', []);
+  const [historialLocal, setHistorialLocal] = useLocalStorage('vc_historial', []);
   const [drawHistory, setDrawHistory] = useLocalStorage('vc_sorteos', []);
   const [currentCountryId, setCurrentCountryId] = useLocalStorage('vc_pais_actual', null);
 
   const [view, setView] = useState(() => (readLS('vc_pais_actual', null) ? 'pais' : 'inicio'));
   const [lastCooked, setLastCooked] = useState(null);
+
+  const { usuario, loading: authLoading, disponible: authDisponible, enviarMagicLink, cerrarSesion } =
+    useAuth();
+  const { favoritosCloud, historialCloud, toggleFavoritoCloud, agregarHistorialCloud, migrarDatosLocalesSiHaceFalta } =
+    useCloudData(usuario);
+
+  const estaLogueado = !!usuario;
+  const favorites = estaLogueado ? favoritosCloud : favoritosLocal;
+  const history = estaLogueado ? historialCloud : historialLocal;
+
+  // Al loguearse por primera vez, si la cuenta todavía no tiene datos
+  // propios, subimos lo que ya se había guardado en modo invitado para
+  // no perder nada.
+  useEffect(() => {
+    if (usuario) {
+      migrarDatosLocalesSiHaceFalta(favoritosLocal, historialLocal);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuario?.id]);
 
   const currentCountry = countries.find((c) => c.id === currentCountryId) || null;
 
@@ -31,7 +53,11 @@ export default function App() {
   }
 
   function handleToggleFavorite(country, recipe) {
-    setFavorites((prev) => {
+    if (estaLogueado) {
+      toggleFavoritoCloud(country, recipe);
+      return;
+    }
+    setFavoritosLocal((prev) => {
       const existe = prev.some((f) => f.recipeId === recipe.id);
       if (existe) return prev.filter((f) => f.recipeId !== recipe.id);
       return [
@@ -52,20 +78,28 @@ export default function App() {
 
   function handleCocinarEstaSemana(country, recipe) {
     const fecha = new Date().toISOString();
-    setHistory((prev) => [
-      ...prev,
-      {
-        recipeId: recipe.id,
-        countryId: country.id,
-        pais: country.pais,
-        bandera: country.bandera,
-        continente: country.continente,
-        nombre: recipe.nombre,
-        tipo: recipe.tipo,
-        accesibilidad: recipe.accesibilidad,
-        fecha,
-      },
-    ]);
+
+    if (estaLogueado) {
+      agregarHistorialCloud(country, recipe);
+    } else {
+      setHistorialLocal((prev) => [
+        ...prev,
+        {
+          recipeId: recipe.id,
+          countryId: country.id,
+          pais: country.pais,
+          bandera: country.bandera,
+          continente: country.continente,
+          nombre: recipe.nombre,
+          tipo: recipe.tipo,
+          accesibilidad: recipe.accesibilidad,
+          fecha,
+        },
+      ]);
+    }
+
+    // El registro de sorteos (anti-repetición de 4 semanas) queda local
+    // en todos los casos, no depende de la cuenta.
     setDrawHistory((prev) => [...prev, { countryId: country.id, fecha }]);
     setLastCooked({ countryId: country.id, nombre: recipe.nombre });
   }
@@ -80,6 +114,14 @@ export default function App() {
   return (
     <div className="app-shell">
       <Header view={view} onNavigate={handleNavigate} />
+
+      <AuthBar
+        disponible={authDisponible}
+        usuario={usuario}
+        loading={authLoading}
+        onEnviarLink={enviarMagicLink}
+        onCerrarSesion={cerrarSesion}
+      />
 
       <main className="app-main">
         {(view === 'inicio' || view === 'pais') && (
