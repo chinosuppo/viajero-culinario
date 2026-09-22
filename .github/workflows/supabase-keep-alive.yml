@@ -1,0 +1,22 @@
+name: Supabase keep-alive
+
+# El plan gratis de Supabase pausa un proyecto tras 7 días sin actividad.
+# Este workflow le pega un pedido liviano cada día para que nunca llegue
+# a pausarse. La URL y la anon key son públicas por diseño (son las mismas
+# que ya viajan en el bundle de la app publicada), así que no hace falta
+# guardarlas como secrets.
+
+on:
+  schedule:
+    - cron: '0 12 * * *' # todos los días a las 12:00 UTC (09:00 Argentina)
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping al endpoint REST de Supabase
+        run: |
+          curl -sS -o /dev/null -w "HTTP %{http_code}\n" --max-time 20 \
+            "https://ieqtfhdqfvpfstvbfxol.supabase.co/rest/v1/" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllcXRmaGRxZnZwZnN0dmJmeG9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3MzE3MDAsImV4cCI6MjEwNDMwNzcwMH0.YrQlTH95pqNy_TI7l5xwcDe0WmEQRdYXyHv5HkfY040"
