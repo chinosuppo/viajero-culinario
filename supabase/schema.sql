@@ -52,3 +52,7 @@ create policy "usuarios ven su historial"
 create policy "usuarios insertan su historial"
   on public.historial for insert
   with check (auth.uid() = user_id);
+
+create policy "usuarios borran su historial"
+  on public.historial for delete
+  using (auth.uid() = user_id);
