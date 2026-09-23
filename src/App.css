@@ -251,6 +251,22 @@
   font-size: 0.9rem;
 }
 
+.btn-link {
+  display: block;
+  margin: 1rem auto 0;
+  background: none;
+  border: none;
+  color: var(--teal-dark);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-link:hover {
+  color: var(--terracota);
+}
+
 /* ---------- Buttons ---------- */
 .btn-primary,
 .btn-secondary,
@@ -678,6 +694,82 @@
 
 .bar-fill.rojo {
   background: var(--rojo);
+}
+
+/* ---------- Country picker ---------- */
+.country-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.country-picker-header h2 {
+  color: var(--teal-dark);
+  font-size: 1.5rem;
+}
+
+.country-picker-header .btn-link {
+  margin: 0;
+}
+
+.country-picker-search {
+  width: 100%;
+  border: 2px solid var(--borde);
+  border-radius: 999px;
+  padding: 0.7rem 1.25rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  margin-bottom: 1rem;
+  background: var(--crema-card);
+  color: var(--marron);
+}
+
+.country-picker-search:focus {
+  outline: none;
+  border-color: var(--terracota);
+}
+
+.country-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.country-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--crema-card);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  color: var(--marron);
+}
+
+.country-picker-item:hover {
+  border-color: var(--terracota);
+  background: #fff;
+}
+
+.country-picker-flag {
+  width: 32px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.country-picker-name {
+  flex: 1;
+}
+
+.country-picker-region {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--marron-soft);
 }
 
 @media (max-width: 640px) {

@@ -1,4 +1,4 @@
-export default function Home({ onElegirPais, restantes, total }) {
+export default function Home({ onElegirPais, onIrABuscarPais, restantes, total }) {
   return (
     <div className="home">
       <div className="home-hero">
@@ -9,6 +9,9 @@ export default function Home({ onElegirPais, restantes, total }) {
         </p>
         <button className="btn-primary btn-hero" onClick={onElegirPais}>
           🎲 Elegir País
+        </button>
+        <button className="btn-link" onClick={onIrABuscarPais}>
+          ¿Ya sabés qué país? Elegilo vos
         </button>
         <p className="home-counter">
           Te quedan <strong>{restantes}</strong> de <strong>{total}</strong> países por explorar

@@ -6,7 +6,7 @@ const TABS = [
 ];
 
 export default function Header({ view, onNavigate }) {
-  const activeTab = view === 'pais' ? 'inicio' : view;
+  const activeTab = view === 'pais' || view === 'buscar' ? 'inicio' : view;
 
   return (
     <header className="app-header">

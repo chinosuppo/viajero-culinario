@@ -8,6 +8,7 @@ import Header from './components/Header';
 import AuthBar from './components/AuthBar';
 import FilterPanel from './components/FilterPanel';
 import Home from './components/Home';
+import CountryPicker from './components/CountryPicker';
 import CountryView from './components/CountryView';
 import FavoritesView from './components/FavoritesView';
 import HistoryView from './components/HistoryView';
@@ -53,6 +54,12 @@ export default function App() {
   function handleElegirPais() {
     const country = pickRandomCountry(countries, history, filter);
     setCurrentCountryId(country.id);
+    setLastCooked(null);
+    setView('pais');
+  }
+
+  function handleElegirPaisEspecifico(countryId) {
+    setCurrentCountryId(countryId);
     setLastCooked(null);
     setView('pais');
   }
@@ -148,7 +155,20 @@ export default function App() {
         )}
 
         {view === 'inicio' && (
-          <Home onElegirPais={handleElegirPais} restantes={restantes} total={countries.length} />
+          <Home
+            onElegirPais={handleElegirPais}
+            onIrABuscarPais={() => setView('buscar')}
+            restantes={restantes}
+            total={countries.length}
+          />
+        )}
+
+        {view === 'buscar' && (
+          <CountryPicker
+            countries={countries}
+            onElegir={handleElegirPaisEspecifico}
+            onCancelar={() => setView('inicio')}
+          />
         )}
 
         {view === 'pais' && currentCountry && (
