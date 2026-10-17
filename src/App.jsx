@@ -24,11 +24,20 @@ export default function App() {
   const [view, setView] = useState(() => (readLS('vc_pais_actual', null) ? 'pais' : 'inicio'));
   const [lastCooked, setLastCooked] = useState(null);
 
-  const { usuario, loading: authLoading, disponible: authDisponible, enviarMagicLink, cerrarSesion } =
-    useAuth();
+  const {
+    usuario,
+    loading: authLoading,
+    disponible: authDisponible,
+    enviarMagicLink,
+    cerrarSesion,
+    necesitaEmail,
+    completarConEmail,
+    errorLink,
+  } = useAuth();
   const {
     favoritosCloud,
     historialCloud,
+    cloudListo,
     toggleFavoritoCloud,
     agregarHistorialCloud,
     eliminarHistorialCloud,
@@ -41,13 +50,13 @@ export default function App() {
 
   // Al loguearse por primera vez, si la cuenta todavía no tiene datos
   // propios, subimos lo que ya se había guardado en modo invitado para
-  // no perder nada.
+  // no perder nada (espera a que lleguen los datos de la cuenta).
   useEffect(() => {
-    if (usuario) {
+    if (usuario && cloudListo) {
       migrarDatosLocalesSiHaceFalta(favoritosLocal, historialLocal);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usuario?.id]);
+  }, [usuario?.id, cloudListo]);
 
   const currentCountry = countries.find((c) => c.id === currentCountryId) || null;
 
@@ -147,6 +156,9 @@ export default function App() {
         loading={authLoading}
         onEnviarLink={enviarMagicLink}
         onCerrarSesion={cerrarSesion}
+        necesitaEmail={necesitaEmail}
+        onCompletarEmail={completarConEmail}
+        errorLink={errorLink}
       />
 
       <main className="app-main">

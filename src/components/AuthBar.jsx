@@ -1,6 +1,15 @@
 import { useState } from 'react';
 
-export default function AuthBar({ disponible, usuario, loading, onEnviarLink, onCerrarSesion }) {
+export default function AuthBar({
+  disponible,
+  usuario,
+  loading,
+  onEnviarLink,
+  onCerrarSesion,
+  necesitaEmail,
+  onCompletarEmail,
+  errorLink,
+}) {
   const [email, setEmail] = useState('');
   const [estado, setEstado] = useState('idle'); // idle | enviando | enviado | error
   const [errorMsg, setErrorMsg] = useState('');
@@ -21,12 +30,37 @@ export default function AuthBar({ disponible, usuario, loading, onEnviarLink, on
     );
   }
 
+  if (necesitaEmail) {
+    return (
+      <form
+        className="auth-bar"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (email.trim()) onCompletarEmail(email.trim());
+        }}
+      >
+        <span className="auth-status">Abriste el link en otro dispositivo. Confirmá tu email para entrar:</span>
+        <input
+          type="email"
+          required
+          placeholder="tu@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="auth-input"
+        />
+        <button className="auth-link-btn" type="submit">
+          Entrar
+        </button>
+      </form>
+    );
+  }
+
   if (estado === 'enviado') {
     return (
       <div className="auth-bar">
         <span className="auth-status">
-          📬 Te mandamos un link a <strong>{email}</strong>. Abrilo desde este mismo dispositivo
-          para entrar.
+          📬 Te mandamos un link a <strong>{email}</strong>. Abrilo para entrar (revisá también
+          spam).
         </span>
         <button className="auth-link-btn" onClick={() => setEstado('idle')}>
           Usar otro email
@@ -66,6 +100,7 @@ export default function AuthBar({ disponible, usuario, loading, onEnviarLink, on
         {estado === 'enviando' ? 'Enviando...' : 'Enviarme el link'}
       </button>
       {estado === 'error' && <span className="auth-error">{errorMsg}</span>}
+      {errorLink && estado !== 'error' && <span className="auth-error">{errorLink}</span>}
     </form>
   );
 }
